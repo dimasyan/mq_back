@@ -43,6 +43,6 @@ const __dirname = dirname(__filename);
 app.use('/output', express.static(join(__dirname, 'output')));
 app.use('/api', gameRoutes);
 
-app.listen(port, () => {
+app.listen(port,() => {
   console.log(`Server is running on http://localhost:${port}`);
 });

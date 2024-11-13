@@ -60,7 +60,8 @@ async function processSong(filePath) {
 
   // Generate random start times
   const randomStart1 = Math.floor(Math.random() * 30); // Random between 0 and 30 seconds
-  const randomStart2 = Math.max(duration - 30, 0) + Math.floor(Math.random() * 30); // Random in the last 30 sec
+  const lastMinuteStart = Math.max(duration - 60, 0); // Start of the last minute
+  const randomStart2 = lastMinuteStart + Math.floor(Math.random() * 30); // Random in the last 30 sec
 
   // Generate unique filenames for the cuts
   const cut1File = path.join(currentOutputFolder, `${songName}_cut1_${uuidv4()}.mp3`);
