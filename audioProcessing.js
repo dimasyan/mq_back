@@ -15,7 +15,7 @@ const mbApi = new MusicBrainzApi({
 });
 
 // Path to your songs folder and output folder
-const songsFolderPath = path.join(process.cwd(), 'songs');
+const songsFolderPath = path.join(process.cwd(), 'downloads');
 const outputFolderPath = path.join(process.cwd(), 'output');
 
 // Create a folder with the current datetime
@@ -44,6 +44,7 @@ function createAudioCut(inputFile, startTime, duration, outputFile) {
     ffmpeg(inputFile)
       .setStartTime(startTime)
       .setDuration(duration)
+      .audioCodec('libopus')
       .on('end', () => resolve())
       .on('error', (err) => reject(err))
       .save(outputFile);
@@ -60,12 +61,13 @@ async function processSong(filePath) {
 
   // Generate random start times
   const randomStart1 = Math.floor(Math.random() * 30); // Random between 0 and 30 seconds
-  const lastMinuteStart = Math.max(duration - 60, 0); // Start of the last minute
-  const randomStart2 = lastMinuteStart + Math.floor(Math.random() * 30); // Random in the last 30 sec
+  const minStart = 30; // Start of the last minute
+  const maxStart = Math.floor(duration / 2)
+  const randomStart2 = minStart + Math.floor(Math.random() * (maxStart - minStart)); // Random in the last 30 sec
 
   // Generate unique filenames for the cuts
-  const cut1File = path.join(currentOutputFolder, `${songName}_cut1_${uuidv4()}.mp3`);
-  const cut2File = path.join(currentOutputFolder, `${songName}_cut2_${uuidv4()}.mp3`);
+  const cut1File = path.join(currentOutputFolder, `${songName}_cut1_${uuidv4()}.webm`);
+  const cut2File = path.join(currentOutputFolder, `${songName}_cut2_${uuidv4()}.webm`);
 
   try {
     console.log(`Processing ${songName}...`);
