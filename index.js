@@ -5,7 +5,9 @@ import cors from "cors";
 import path from "path";
 import gameRoutes from "./routes/game.js"
 import * as https from "https";
-import { Pool } from 'pg';
+import pkg from 'pg';
+
+const { Pool } = pkg;
 
 const app = express();
 const httpsPort = 3000;
