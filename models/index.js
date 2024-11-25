@@ -2,6 +2,7 @@
 import QuestionModel from './question.js';
 import GameModel from './game.js';
 import GameQuestionModel from './gameQuestion.js';
+import UserModel from './user.js';
 import Sequelize from 'sequelize';
 
 const sequelize = new Sequelize(
@@ -17,11 +18,13 @@ const sequelize = new Sequelize(
 export const Question = QuestionModel(sequelize, Sequelize.DataTypes);
 export const Game = GameModel(sequelize, Sequelize.DataTypes);
 export const GameQuestion = GameQuestionModel(sequelize, Sequelize.DataTypes);
+export const User = UserModel(sequelize, Sequelize.DataTypes);
 
 const models = {
   Question,
   Game,
   GameQuestion,
+  User,
 };
 
 // Set up associations

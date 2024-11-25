@@ -1,15 +1,15 @@
-import express from 'express';
-import pkg from 'pg';
-import gameRoutes from './routes/game.js';
-import cors from 'cors';
-import { fileURLToPath } from 'url';
-import { dirname, join } from 'path';
+import fs from "fs";
+import express from "express";
+import {fileURLToPath} from "url";
+import cors from "cors";
+import path from "path";
+import gameRoutes from "./routes/game.js"
+import * as https from "https";
 
 const { Pool } = pkg;
 
 const app = express();
-const port = 3000;
-
+const httpsPort = 3000;
 app.use(cors({
   origin: '*', // Allow all origins
 }))
@@ -39,10 +39,15 @@ app.get('/test-db', async (req, res) => {
 });
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+const __dirname = path.dirname(__filename);
 app.use('/output', express.static(join(__dirname, 'output')));
 app.use('/api', gameRoutes);
 
-app.listen(port,() => {
-  console.log(`Server is running on http://localhost:${port}`);
-});
+const httpsOptions = {
+  key: fs.readFileSync('/etc/letsencrypt/live/dimashbratan.kz/privkey.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/dimashbratan.kz/fullchain.pem')
+};
+
+https.createServer(httpsOptions, app).listen(httpsPort, () => {
+  console.log(`Server is running on https://localhost:${httpsPort}`);
+})
