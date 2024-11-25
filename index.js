@@ -40,7 +40,7 @@ app.get('/test-db', async (req, res) => {
 });
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = dirname(__filename);
 app.use('/output', express.static(join(__dirname, 'output')));
 app.use('/api', gameRoutes);
 
