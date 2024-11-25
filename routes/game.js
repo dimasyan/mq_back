@@ -14,7 +14,7 @@ router.post('/newgame', async (req, res) => {
     }
 
     // Find or create the user
-    let user = await User.findOne({ where: { tg_id } });
+    let user = await User.findOne({ where: { tg_id: tg_id.toString() } });
     if (!user) {
       user = await User.create({ tg_id, tg_username });
     }

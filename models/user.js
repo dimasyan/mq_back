@@ -10,7 +10,7 @@ export default (sequelize, DataTypes) => {
   User.init(
     {
       tg_id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.STRING,
         allowNull: false,
       },
       tg_username: {

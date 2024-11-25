@@ -13,7 +13,7 @@ export default (sequelize, DataTypes) => {
   Game.init({
     status: DataTypes.STRING,
     score: DataTypes.INTEGER,
-    tg_id: DataTypes.INTEGER
+    tg_id: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'Game',
