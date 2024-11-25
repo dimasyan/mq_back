@@ -2,7 +2,7 @@ import fs from "fs";
 import express from "express";
 import {fileURLToPath} from "url";
 import cors from "cors";
-import path from "path";
+import { dirname, join } from 'path';
 import gameRoutes from "./routes/game.js"
 import * as https from "https";
 import pkg from 'pg';
