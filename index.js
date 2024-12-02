@@ -44,15 +44,15 @@ const __dirname = dirname(__filename);
 app.use('/output', express.static(join(__dirname, 'output')));
 app.use('/api', gameRoutes);
 
-const httpsOptions = {
+/* const httpsOptions = {
   key: fs.readFileSync('/etc/letsencrypt/live/dimashbratan.kz/privkey.pem'),
   cert: fs.readFileSync('/etc/letsencrypt/live/dimashbratan.kz/fullchain.pem')
 };
 
 https.createServer(httpsOptions, app).listen(httpsPort, () => {
   console.log(`Server is running on https://localhost:${httpsPort}`);
-})
+}) */
 
-/*app.listen(3000, () => {
+app.listen(3000, () => {
   console.log(`Server is running on http://localhost:3000`);
-}); */
+});

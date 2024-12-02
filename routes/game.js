@@ -208,7 +208,7 @@ router.get('/newmoviegame', async (req, res) => {
           questionText = 'Неизвестно';
       }
 
-      if (questionText === 'Неизвестно') {
+      if (questionText.includes('Неизвестно')) {
 
         questionText = `Назовите ${movieType} по актерскому составу: ${
           Array.isArray(persons.actors) && persons.actors.length > 0
@@ -225,6 +225,7 @@ router.get('/newmoviegame', async (req, res) => {
         alternativeName: movie.alternativeName,
         year: movie.year,
         director: persons.directors,
+        genres: movie.genres,
         type: movie.type
       };
     });
