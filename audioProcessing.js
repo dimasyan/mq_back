@@ -44,7 +44,7 @@ function createAudioCut(inputFile, startTime, duration, outputFile) {
     ffmpeg(inputFile)
       .setStartTime(startTime)
       .setDuration(duration)
-      .audioCodec('libopus')
+      .audioCodec('libmp3lame')
       .on('end', () => resolve())
       .on('error', (err) => reject(err))
       .save(outputFile);
@@ -66,8 +66,8 @@ async function processSong(filePath) {
   const randomStart2 = minStart + Math.floor(Math.random() * (maxStart - minStart)); // Random in the last 30 sec
 
   // Generate unique filenames for the cuts
-  const cut1File = path.join(currentOutputFolder, `${songName}_cut1_${uuidv4()}.webm`);
-  const cut2File = path.join(currentOutputFolder, `${songName}_cut2_${uuidv4()}.webm`);
+  const cut1File = path.join(currentOutputFolder, `${songName}_cut1_${uuidv4()}.mp3`);
+  const cut2File = path.join(currentOutputFolder, `${songName}_cut2_${uuidv4()}.mp3`);
 
   try {
     console.log(`Processing ${songName}...`);

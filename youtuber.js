@@ -9,7 +9,7 @@ import { exec } from 'child_process'; // Import exec for executing ffmpeg comman
 // Read the array of YouTube links from a JSON file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const links = JSON.parse(fs.readFileSync('mix6.json', 'utf-8'));
+const links = JSON.parse(fs.readFileSync('popmix.json', 'utf-8'));
 
 // Create the /downloads folder if it doesn't exist
 const downloadsDir = path.resolve(__dirname, 'downloads');

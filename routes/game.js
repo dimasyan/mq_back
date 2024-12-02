@@ -1,6 +1,6 @@
 // routes/game.js
 import express from 'express';
-import { Game, GameQuestion, Question, User } from '../models/index.js';
+import { Game, GameQuestion, Question, User, Movie } from '../models/index.js';
 import Sequelize from 'sequelize';
 
 const router = express.Router();
@@ -138,6 +138,110 @@ router.get('/leaderboard', async (req, res) => {
   } catch (error) {
     console.error('Error fetching leaderboard:', error);
     res.status(500).json({ message: 'Error fetching leaderboard', error });
+  }
+});
+
+const movieQuestionTypes = [
+  'Назовите фильм по актерскому составу',
+  'Назовите фильм по интересному факту',
+  'Назовите фильм по слогану',
+  'Назовите фильм по описанию',
+];
+
+router.get('/newmoviegame', async (req, res) => {
+  try {
+    // Create a new game for the user
+    const game = await Game.create({
+      status: 'pending',
+      score: 0,
+    });
+
+    // Fetch random 10 movies
+    const movies = await Movie.findAll({
+      limit: 10,
+      order: Sequelize.literal('RANDOM()'),
+    });
+
+    if (!movies || movies.length < 10) {
+      return res.status(400).json({ message: 'Not enough movies available to create a game' });
+    }
+    console.log(movies)
+
+    // Create game questions based on movieQuestionTypes
+    const gameQuestions = movies.map((movie) => {
+      let movieType = movie.type === 'movie' ? 'фильм' : 'сериал'
+      if (movie.type === 'cartoon') movieType = 'мультфильм'
+        // Randomly select a question type
+      let questionType = movieQuestionTypes[Math.floor(Math.random() * movieQuestionTypes.length)];
+      let questionText = '';
+      const persons = typeof movie.persons === 'string' ? JSON.parse(movie.persons) : movie.persons;
+
+      switch (questionType) {
+        case `Назовите фильм по актерскому составу`:
+          // Parse the JSON string into an object
+          questionText = `Назовите ${movieType} по актерскому составу: ${
+            Array.isArray(persons.actors) && persons.actors.length > 0
+              ? persons.actors.slice(0, 5).join(', ') // No need to map as `actors` is already an array of names
+              : 'Неизвестно'
+          }`;
+          break;
+
+        case 'Назовите фильм по интересному факту':
+          const facts = typeof movie.facts === 'string' ? JSON.parse(movie.facts) : movie.facts;
+
+          questionText = `Назовите ${movieType} по интересному факту: ${
+            Array.isArray(facts) && facts.length > 0
+              ? facts[Math.floor(Math.random() * facts.length)] // Random fact
+              : 'Неизвестно'
+          }`;
+          break;
+
+        case 'Назовите фильм по слогану':
+          questionText = `Назовите ${movieType} по слогану: ${movie.slogan || 'Неизвестно'}`;
+          break;
+
+        case 'Назовите фильм по описанию':
+          questionText = `Назовите ${movieType} по описанию: ${movie.shortDescription || (movie.description || 'Неизвестно')}`;
+          break;
+
+        default:
+          questionText = 'Неизвестно';
+      }
+
+      if (questionText === 'Неизвестно') {
+
+        questionText = `Назовите ${movieType} по актерскому составу: ${
+          Array.isArray(persons.actors) && persons.actors.length > 0
+            ? persons.actors.slice(0, 5).join(', ') // No need to map as `actors` is already an array of names
+            : 'Неизвестно'
+        }`;
+      }
+
+      return {
+        gameId: game.id,
+        questionText,
+        answer: movie.name,
+        enName: movie.enName,
+        alternativeName: movie.alternativeName,
+        year: movie.year,
+        director: persons.directors,
+        type: movie.type
+      };
+    });
+
+    // Save game questions
+    game.gameQuestions = gameQuestions;
+
+    res.status(201).json({
+      message: 'New movie game created!',
+      game: {
+        ...game.toJSON(),
+        gameQuestions
+      }
+    });
+  } catch (error) {
+    console.error('Error creating movie game:', error);
+    res.status(500).json({ message: 'Error creating movie game', error });
   }
 });
 

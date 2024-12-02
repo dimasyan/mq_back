@@ -8,7 +8,7 @@ const youtubeClienId = '1031732237021-oflo09ib5nbkp1mn9jmml27bfk5h36l4.apps.goog
 const youtubeClienSecret = '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';
 const clientId = '86fea91bbbfc4ced9fa19faeb1d1da2f';
 const clientSecret = '0b86f79cf7d64a48baa689340527a39b';
-const token = 'BQDX2k_6Gymt91fyo_rsvFNgTqKVAbntoN6NS2-hZYePi5C-5H0uyIY1xXpQQjfQWu1qolYKX0rzLfL3wD928U98sbyhnUZAeaJIA6SBd5Ie27h4J_g';
+const token = 'BQC6GjSWpbatwhRB6FUzJBQS-r4_5H51rnBCgOUb4B-wejaoc5bdEbxdytOl91S7B-gH9FVzQz9SDTsUOQ9F0BD-7pcjM1IEeWWNnqyFltqIb-zp404';
 
 // Create a browser instance once
 let browser;
@@ -69,7 +69,7 @@ const getAccessToken = async () => {
 
 const getPlaylists = async () => {
   try {
-    const response = await axios.get('https://api.spotify.com/v1/playlists/37i9dQZF1E37k18pDGr9D3', {
+    const response = await axios.get('https://api.spotify.com/v1/playlists/37i9dQZF1EQn4jwNIohw50', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -122,4 +122,4 @@ initBrowser().then(() => {
   getPlaylists();
   // getAccessToken(); // Uncomment if you need to get an access token
 });
-//getAccessToken();
+// getAccessToken();
