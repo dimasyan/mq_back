@@ -2,12 +2,11 @@ import puppeteer from 'puppeteer'; // Make sure you import puppeteer
 import axios from 'axios';
 import qs from 'qs';
 import fs from 'fs';
+import dotenv from "dotenv";
 
-const youtubeApiKey = 'AIzaSyAcp_0nn9Bcjef6DQIb4hO4eHc7RkpkvhM';
-const youtubeClienId = '1031732237021-oflo09ib5nbkp1mn9jmml27bfk5h36l4.apps.googleusercontent.com';
-const youtubeClienSecret = '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';
-const clientId = '86fea91bbbfc4ced9fa19faeb1d1da2f';
-const clientSecret = '0b86f79cf7d64a48baa689340527a39b';
+dotenv.config();
+const clientId = process.env.SP_CLIENT_ID;
+const clientSecret = process.env.SP_CLIENT_SECRET;
 const token = 'BQC6GjSWpbatwhRB6FUzJBQS-r4_5H51rnBCgOUb4B-wejaoc5bdEbxdytOl91S7B-gH9FVzQz9SDTsUOQ9F0BD-7pcjM1IEeWWNnqyFltqIb-zp404';
 
 // Create a browser instance once
