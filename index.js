@@ -48,8 +48,8 @@ app.use('/api', gameRoutes);
 
 if (process.env.NODE_ENV === 'prod') {
   const httpsOptions = {
-    key: fs.readFileSync('/etc/letsencrypt/live/dimashbratan.kz/privkey.pem'),
-    cert: fs.readFileSync('/etc/letsencrypt/live/dimashbratan.kz/fullchain.pem')
+    key: fs.readFileSync('/etc/letsencrypt/live/izzyquiz.kz/privkey.pem'),
+    cert: fs.readFileSync('/etc/letsencrypt/live/izzyquiz.kz/fullchain.pem')
   };
 
   https.createServer(httpsOptions, app).listen(httpsPort, () => {
