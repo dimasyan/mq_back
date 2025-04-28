@@ -5,7 +5,7 @@ import { Model } from 'sequelize';
 export default (sequelize, DataTypes) => {
   class Game extends Model {
     static associate(models) {
-      Game.hasMany(models.GameQuestion, { foreignKey: 'gameId' });
+      Game.hasMany(models.GameQuestion, { foreignKey: 'gameId', as: 'gameQuestions' });
       Game.belongsTo(models.Game, { foreignKey: 'tg_id', targetKey: 'tg_id', })
     }
   }

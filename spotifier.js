@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const clientId = process.env.SP_CLIENT_ID;
 const clientSecret = process.env.SP_CLIENT_SECRET;
-const token = 'BQC6GjSWpbatwhRB6FUzJBQS-r4_5H51rnBCgOUb4B-wejaoc5bdEbxdytOl91S7B-gH9FVzQz9SDTsUOQ9F0BD-7pcjM1IEeWWNnqyFltqIb-zp404';
+const token = 'BQCzIhk-hEdX3lUM13qNiiCRHoxYVRIe67SLKqNz5MYUqj198sR3X4VzgCW_MUQmNroC-hzA-t3HpPMo7M9jHnTm6Cn0gfCpxeIQtdBC2gIUBe_GNdw';
 
 // Create a browser instance once
 let browser;
@@ -68,7 +68,7 @@ const getAccessToken = async () => {
 
 const getPlaylists = async () => {
   try {
-    const response = await axios.get('https://api.spotify.com/v1/playlists/37i9dQZF1EQn4jwNIohw50', {
+    const response = await axios.get('https://api.spotify.com/v1/playlists/1JNYqFwOv1bIrXUjHTIDAC', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -121,4 +121,4 @@ initBrowser().then(() => {
   getPlaylists();
   // getAccessToken(); // Uncomment if you need to get an access token
 });
-// getAccessToken();
+//getAccessToken();

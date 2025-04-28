@@ -4,6 +4,7 @@ import GameModel from './game.js';
 import GameQuestionModel from './gameQuestion.js';
 import UserModel from './user.js';
 import MovieModel from './movie.js';
+import GameRegistrationModel from './gameRegistration.js';
 import Sequelize from 'sequelize';
 
 const sequelize = new Sequelize(
@@ -21,6 +22,7 @@ export const Game = GameModel(sequelize, Sequelize.DataTypes);
 export const GameQuestion = GameQuestionModel(sequelize, Sequelize.DataTypes);
 export const User = UserModel(sequelize, Sequelize.DataTypes);
 export const Movie = MovieModel(sequelize, Sequelize.DataTypes);
+export const GameRegistration = GameRegistrationModel(sequelize, Sequelize.DataTypes);
 
 const models = {
   Question,
@@ -28,6 +30,7 @@ const models = {
   GameQuestion,
   User,
   Movie,
+  GameRegistration,
 };
 
 // Set up associations

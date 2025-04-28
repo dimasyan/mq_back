@@ -4,7 +4,7 @@ import { exec } from 'child_process';
 import ffmpeg from 'ffmpeg-static';
 
 // Path to your song directory
-const songsDir = path.resolve('./songs');
+const songsDir = path.resolve('./downloads');
 
 // Function to convert .webm to .mp3 using ffmpeg-static
 const convertWebmToMp3 = (webmFilePath, mp3FilePath) => {

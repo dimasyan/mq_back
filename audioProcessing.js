@@ -15,7 +15,7 @@ const mbApi = new MusicBrainzApi({
 });
 
 // Path to your songs folder and output folder
-const songsFolderPath = path.join(process.cwd(), 'downloads');
+const songsFolderPath = path.join(process.cwd(), 'songs');
 const outputFolderPath = path.join(process.cwd(), 'output');
 
 // Create a folder with the current datetime

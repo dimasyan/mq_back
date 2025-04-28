@@ -1,7 +1,8 @@
 // routes/game.js
 import express from 'express';
-import { Game, GameQuestion, Question, User, Movie } from '../models/index.js';
+import {Game, GameQuestion, Question, User, Movie, GameRegistration} from '../models/index.js';
 import Sequelize from 'sequelize';
+import axios from "axios";
 
 const router = express.Router();
 
@@ -44,6 +45,7 @@ router.post('/newgame', async (req, res) => {
       where: { id: game.id },
       include: {
         model: GameQuestion,
+        as: 'gameQuestions',
         include: {
           model: Question,
           attributes: ['id', 'text', 'correct_answer', 'file_path'],
@@ -53,13 +55,17 @@ router.post('/newgame', async (req, res) => {
 
     // Add the base URL to file paths
     const baseUrl = req.protocol + '://' + req.get('host');
-    fullGame.GameQuestions.forEach((gq) => {
-      if (gq.Question.file_path) {
-        gq.Question.file_path = baseUrl + '/' + gq.Question.file_path;
+    const fullGamePlain = fullGame.get({ plain: true })
+    fullGamePlain.gameQuestions.forEach((gq) => {
+      gq.answer = gq.Question.correct_answer
+      gq.musicQuestion = gq.Question
+      gq.Question = undefined
+      if (gq.musicQuestion.file_path) {
+        gq.musicQuestion.file_path = baseUrl + '/' + gq.musicQuestion.file_path;
       }
     });
 
-    res.status(201).json({ message: 'New game created!', game: fullGame });
+    res.status(201).json({ message: 'New game created!', game: fullGamePlain });
   } catch (error) {
     console.error('Error creating game:', error);
     res.status(500).json({ message: 'Error creating game', error });
@@ -219,14 +225,16 @@ router.get('/newmoviegame', async (req, res) => {
 
       return {
         gameId: game.id,
-        questionText,
         answer: movie.name,
-        enName: movie.enName,
-        alternativeName: movie.alternativeName,
-        year: movie.year,
-        director: persons.directors,
-        genres: movie.genres,
-        type: movie.type
+        movieQuestion: {
+          enName: movie.enName,
+          alternativeName: movie.alternativeName,
+          year: movie.year,
+          director: persons.directors,
+          genres: movie.genres,
+          type: movie.type,
+          questionText,
+        }
       };
     });
 
@@ -246,5 +254,42 @@ router.get('/newmoviegame', async (req, res) => {
   }
 });
 
+const BOT_TOKEN = '8034798264:AAFuNZfIgtLI5hkyIAyRGzpx_fdEZyyXdso'
+const CHAT_ID = '-4793289121'
+router.post('/registerteam', async (req, res) => {
+  try {
+    const { captainName, teamName, phoneNumber } = req.body;
+
+    if (!captainName || !teamName || !phoneNumber) {
+      return res.status(400).json({ message: 'All fields are required: captainName, teamName, phoneNumber' });
+    }
+
+    const registration = await GameRegistration.create({
+      captainName,
+      teamName,
+      phoneNumber,
+    });
+
+    const message = `
+      📣 *Новая Регистрация!*
+        
+      *Команда*: ${teamName}
+      *Капитан*: ${captainName}
+      *Телефон*: ${phoneNumber}
+    `;
+
+    // Send Telegram Notification
+    await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+      chat_id: CHAT_ID,
+      text: message,
+      parse_mode: 'Markdown',
+    });
+
+    res.status(201).json({ message: 'Team registered successfully!', registration });
+  } catch (error) {
+    console.error('Error registering team:', error);
+    res.status(500).json({ message: 'Error registering team', error });
+  }
+});
 
 export default router;
