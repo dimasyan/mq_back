@@ -109,11 +109,10 @@ function processSongsFolder() {
       console.error(`Error reading the songs folder: ${err.message}`);
       return;
     }
-    const file = files[1]
-    //files.forEach((file) => {
+    files.forEach((file) => {
       const filePath = path.join(songsFolderPath, file);
       processSong(filePath); // Process each song
-    //});
+    });
   });
 }
 
