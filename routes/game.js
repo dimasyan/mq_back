@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post('/newgame', async (req, res) => {
   try {
-    const { tg_id, tg_username } = req.body;
+    const { tg_id, tg_username, genre } = req.body;
 
     if (!tg_id) {
       return res.status(400).json({ message: 'tg_id is required' });
@@ -27,11 +27,35 @@ router.post('/newgame', async (req, res) => {
       tg_id: user.tg_id
     });
 
-    // Get random questions
-    const questions = await Question.findAll({
+    const randomCutoff = Math.random();
+
+    const whereClause = {
+      ...(genre ? { genre } : {}),
+      random_key: { [Op.gte]: randomCutoff }
+    };
+
+// Try to get 10 questions where random_key >= randomCutoff
+    let questions = await Question.findAll({
+      where: whereClause,
       limit: 10,
-      order: Sequelize.literal('RANDOM()'),
+      order: [['random_key', 'ASC']]
     });
+
+// If not enough questions found, try again with random_key < cutoff
+    if (questions.length < 10) {
+      const fallbackWhere = {
+        ...(genre ? { genre } : {}),
+        random_key: { [Op.lt]: randomCutoff }
+      };
+
+      const moreQuestions = await Question.findAll({
+        where: fallbackWhere,
+        limit: 10 - questions.length,
+        order: [['random_key', 'ASC']]
+      });
+
+      questions = [...questions, ...moreQuestions];
+    }
 
     // Create game-question associations
     const gameQuestions = questions.map((question) => ({

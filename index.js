@@ -7,6 +7,7 @@ import gameRoutes from "./routes/game.js"
 import * as https from "https";
 import pkg from 'pg';
 import dotenv from "dotenv";
+import './cron/updateRandomKeys.js';
 
 dotenv.config();
 const { Pool } = pkg;

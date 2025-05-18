@@ -29,9 +29,9 @@ if (!fs.existsSync(currentOutputFolder)) {
 async function extractMetadata(filePath) {
   try {
     const metadata = await mm.parseFile(filePath);
-    const { artist, title } = metadata.common;
+    const { artist, title, genre, artists } = metadata.common;
     const duration = metadata.format.duration; // Duration in seconds
-    return { artist, title, duration };
+    return { artist, title, duration, genre, artists };
   } catch (err) {
     console.error(`Error reading metadata from ${filePath}: ${err.message}`);
     return null;
@@ -56,7 +56,7 @@ async function processSong(filePath) {
   const metadata = await extractMetadata(filePath);
   if (!metadata) return;
 
-  const { artist, title, duration, genre } = metadata;
+  const { artist, title, duration, genre, artists } = metadata;
   const songName = title || path.basename(filePath, path.extname(filePath));
 
   // Generate random start times
@@ -80,8 +80,8 @@ async function processSong(filePath) {
     const relativeCut2Path = path.relative(process.cwd(), cut2File);
 
     // Save metadata and cuts to the database
-    await saveToDatabase(songName, artist, relativeCut1Path, genre);
-    await saveToDatabase(songName, artist, relativeCut2Path, genre);
+    await saveToDatabase(songName, artists.join(';'), relativeCut1Path, genre.join(';'));
+    await saveToDatabase(songName, artists.join(';'), relativeCut2Path, genre.join(';'));
   } catch (err) {
     console.error(`Error creating cuts for ${filePath}: ${err.message}`);
   }
@@ -109,11 +109,11 @@ function processSongsFolder() {
       console.error(`Error reading the songs folder: ${err.message}`);
       return;
     }
-
-    files.forEach((file) => {
+    const file = files[1]
+    //files.forEach((file) => {
       const filePath = path.join(songsFolderPath, file);
       processSong(filePath); // Process each song
-    });
+    //});
   });
 }
 
