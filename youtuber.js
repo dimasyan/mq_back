@@ -9,7 +9,8 @@ import { exec } from 'child_process'; // Import exec for executing ffmpeg comman
 // Read the array of YouTube links from a JSON file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const links = JSON.parse(fs.readFileSync('rus00.json', 'utf-8'));
+const links = JSON.parse(fs.readFileSync('1JNYqFwOv1bIrXUjHTIDAC.json', 'utf-8'));
+const genre = 'pop'
 
 // Create the /downloads folder if it doesn't exist
 const downloadsDir = path.resolve(__dirname, 'downloads');
@@ -40,7 +41,7 @@ const downloadAndInjectMetadata = async (url, index, fileName, metadata) => {
       console.log(`Downloaded .webm file: ${webmOutputPath}`);
 
       // Inject metadata using ffmpeg
-      const metadataCommand = `${ffmpegPath} -i "${webmOutputPath}" -metadata title="${metadata.title}" -metadata artist="${metadata.artist}" -c:v libvpx -c:a libvorbis -y "${webmWithMetadataPath}"`;
+      const metadataCommand = `${ffmpegPath} -i "${webmOutputPath}" -metadata title="${metadata.title}" -metadata artist="${metadata.artist}" -metadata genre="${genre}" -c:v libvpx -c:a libvorbis -y "${webmWithMetadataPath}"`;
 
       exec(metadataCommand, (metadataError, metaStdout, metaStderr) => {
         if (metadataError) {
@@ -91,11 +92,23 @@ const downloadAndInjectMetadata = async (url, index, fileName, metadata) => {
 // Download each link
 links.forEach((trackItem, index) => {
   if (trackItem.ytUrl) {
+    const artist = trackItem.artists.map(artist => artist.name).join(';')
     const metaData = {
-      artist: trackItem.artists[0].name,
+      artist,
       title: trackItem.name
     };
     const fileName = `${trackItem.artists[0].name} - ${trackItem.name}`;
     downloadAndInjectMetadata(trackItem.ytUrl, index, fileName, metaData);
   }
 });
+
+/* const trackItem = links[0]
+if (trackItem.ytUrl) {
+  const artist = trackItem.artists.map(artist => artist.name).join(';')
+  const metaData = {
+    artist,
+    title: trackItem.name
+  };
+  const fileName = `${trackItem.artists[0].name} - ${trackItem.name}`;
+  downloadAndInjectMetadata(trackItem.ytUrl, 0, fileName, metaData);
+}*/

@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const clientId = process.env.SP_CLIENT_ID;
 const clientSecret = process.env.SP_CLIENT_SECRET;
-const token = 'BQCzIhk-hEdX3lUM13qNiiCRHoxYVRIe67SLKqNz5MYUqj198sR3X4VzgCW_MUQmNroC-hzA-t3HpPMo7M9jHnTm6Cn0gfCpxeIQtdBC2gIUBe_GNdw';
+const token = 'BQBs48klbHPUX7QfJB9c7Om-V5-5Ez5q2YwsRsbVCxHEckgG9mOd9tV8BF8pXLDgXwVfIkkFwWRorTzAyXlekH3BBBEaOgLzXbN7XKAZnJbwcpkhn6-2EoAGOcef-RJi1TGEuLLzAog';
 
 // Create a browser instance once
 let browser;
@@ -68,7 +68,9 @@ const getAccessToken = async () => {
 
 const getPlaylists = async () => {
   try {
-    const response = await axios.get('https://api.spotify.com/v1/playlists/1JNYqFwOv1bIrXUjHTIDAC', {
+    const playlistId = '1JNYqFwOv1bIrXUjHTIDAC'
+    const offset = 150;
+    const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50&offset=${offset}`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -78,12 +80,12 @@ const getPlaylists = async () => {
     const page = await browser.newPage();
     const data = [];
 
-    for (let item of response.data.tracks.items) {
+    for (let item of response.data.items) {
       try {
         // Check if `item.track` and necessary properties exist
         if (item.track && item.track.name && item.track.artists && item.track.artists[0]) {
           console.log(`Processing track: ${item.track.name}`);
-          const ytUrl = await getFirstYouTubeLink(item.track.artists[0].name + ' - ' + item.track.name + ' lyrics', page);
+           const ytUrl = await getFirstYouTubeLink(item.track.artists[0].name + ' - ' + item.track.name + ' lyrics', page);
 
           if (ytUrl) {
             data.push({
@@ -102,17 +104,42 @@ const getPlaylists = async () => {
       }
     }
 
-    console.log(data);
+    const filePath = `${playlistId}.json`;
 
-    // Save the playlist with YouTube URLs
-    fs.writeFileSync(`${response.data.name}.json`, JSON.stringify(data, null, 2));
-    console.log('Playlist saved successfully');
+// Check if file exists
+    if (fs.existsSync(filePath)) {
+      try {
+        // Read existing data from file
+        const existingRaw = fs.readFileSync(filePath, 'utf-8');
+        const existingData = JSON.parse(existingRaw);
+
+        // Merge arrays - you can decide whether to just concat or do some deduplication
+        const mergedData = existingData.concat(data);
+
+        // Save merged array back to file
+        fs.writeFileSync(filePath, JSON.stringify(mergedData, null, 2));
+        console.log(`Updated existing file ${filePath} with new data, total items: ${mergedData.length}`);
+      } catch (e) {
+        console.error('Error reading or writing JSON file:', e);
+      }
+    } else {
+      // File doesn't exist, create new file with data array
+      fs.writeFileSync(filePath, JSON.stringify(data, null, 2));
+      console.log(`Created new file ${filePath} with data`);
+    }
 
     await page.close(); // Close the page after processing all queries
   } catch (e) {
     console.error('Error in getPlaylists:', e);
   }
 };
+
+const calcObjects = () => {
+  const data = fs.readFileSync('1JNYqFwOv1bIrXUjHTIDAC.json', 'utf-8');
+  const arr = JSON.parse(data);
+
+  console.log('Number of objects:', arr.length);
+}
 
 
 // Initialize the browser instance once before starting any scraping tasks
@@ -121,4 +148,5 @@ initBrowser().then(() => {
   getPlaylists();
   // getAccessToken(); // Uncomment if you need to get an access token
 });
-//getAccessToken();
+ // getAccessToken();
+// calcObjects()

@@ -27,19 +27,6 @@ const pool = new Pool({
 });
 
 app.use(express.json());
-app.get('/', (req, res) => {
-  res.send('Music Quiz Backend Service');
-});
-
-// Test DB connection
-app.get('/test-db', async (req, res) => {
-  try {
-    const result = await pool.query('SELECT NOW()');
-    res.send(`Database connected successfully: ${result.rows[0].now}`);
-  } catch (err) {
-    res.status(500).send(`Error: ${err.message}`);
-  }
-});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -52,7 +39,7 @@ if (process.env.NODE_ENV === 'prod') {
     cert: fs.readFileSync('/etc/letsencrypt/live/izzyquiz.kz/fullchain.pem')
   };
 
-  https.createServer(httpsOptions, app).listen(httpsPort, () => {
+  https.createServer(httpsOptions, app).listen(httpsPort, '0.0.0.0', () => {
     console.log(`Server is running on https://localhost:${httpsPort}`);
   })
 } else {

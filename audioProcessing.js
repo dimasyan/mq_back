@@ -56,7 +56,7 @@ async function processSong(filePath) {
   const metadata = await extractMetadata(filePath);
   if (!metadata) return;
 
-  const { artist, title, duration } = metadata;
+  const { artist, title, duration, genre } = metadata;
   const songName = title || path.basename(filePath, path.extname(filePath));
 
   // Generate random start times
@@ -80,20 +80,21 @@ async function processSong(filePath) {
     const relativeCut2Path = path.relative(process.cwd(), cut2File);
 
     // Save metadata and cuts to the database
-    await saveToDatabase(songName, artist, relativeCut1Path);
-    await saveToDatabase(songName, artist, relativeCut2Path);
+    await saveToDatabase(songName, artist, relativeCut1Path, genre);
+    await saveToDatabase(songName, artist, relativeCut2Path, genre);
   } catch (err) {
     console.error(`Error creating cuts for ${filePath}: ${err.message}`);
   }
 }
 
 // Function to save question data to the database
-async function saveToDatabase(text, correctAnswer, filePath) {
+async function saveToDatabase(text, correctAnswer, filePath, genre) {
   try {
     await Question.create({
       text,
       correct_answer: correctAnswer,
-      file_path: filePath.replace(/^.*\/output/, '/output'), // Store relative path starting with /output
+      file_path: filePath.replace(/^.*\/output/, '/output'),
+      genre
     });
     console.log(`Saved question to the database: ${text}`);
   } catch (err) {
