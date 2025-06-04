@@ -7,7 +7,7 @@ import dotenv from "dotenv";
 dotenv.config();
 const clientId = process.env.SP_CLIENT_ID;
 const clientSecret = process.env.SP_CLIENT_SECRET;
-const token = 'BQBs48klbHPUX7QfJB9c7Om-V5-5Ez5q2YwsRsbVCxHEckgG9mOd9tV8BF8pXLDgXwVfIkkFwWRorTzAyXlekH3BBBEaOgLzXbN7XKAZnJbwcpkhn6-2EoAGOcef-RJi1TGEuLLzAog';
+const token = 'BQDPo1-nXJSZfn_jNwt_afOT-JqHtcUz09xbHt8ZP1Mcv6X16aiEAFcrDYJZF70BTYH6T97iPEUaeXBUn_YQ1DP1oys2IFdNaZuaXlNdb8u-8jpOgfUMyFL78BKhvxrDUMZzCQMXW9o';
 
 // Create a browser instance once
 let browser;
@@ -68,7 +68,7 @@ const getAccessToken = async () => {
 
 const getPlaylists = async () => {
   try {
-    const playlistId = '1JNYqFwOv1bIrXUjHTIDAC'
+    const playlistId = '49tW4QpQgfUC4Ow8RNn6AK'
     const offset = 150;
     const response = await axios.get(`https://api.spotify.com/v1/playlists/${playlistId}/tracks?limit=50&offset=${offset}`, {
       headers: {
@@ -148,5 +148,5 @@ initBrowser().then(() => {
   getPlaylists();
   // getAccessToken(); // Uncomment if you need to get an access token
 });
- // getAccessToken();
+// getAccessToken();
 // calcObjects()

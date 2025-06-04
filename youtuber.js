@@ -5,12 +5,13 @@ import { fileURLToPath } from 'url';
 import ffmpegPath from 'ffmpeg-static';
 import sanitize from 'sanitize-filename'; // To sanitize file names
 import { exec } from 'child_process'; // Import exec for executing ffmpeg commands
+import pLimit from 'p-limit';
 
 // Read the array of YouTube links from a JSON file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const links = JSON.parse(fs.readFileSync('1JNYqFwOv1bIrXUjHTIDAC.json', 'utf-8'));
-const genre = 'pop'
+const links = JSON.parse(fs.readFileSync('49tW4QpQgfUC4Ow8RNn6AK.json', 'utf-8'));
+const genre = 'rock'
 
 // Create the /downloads folder if it doesn't exist
 const downloadsDir = path.resolve(__dirname, 'downloads');
@@ -39,9 +40,10 @@ const downloadAndInjectMetadata = async (url, index, fileName, metadata) => {
 
     writeStream.on('finish', () => {
       console.log(`Downloaded .webm file: ${webmOutputPath}`);
+      const safeTitle = metadata.title.replace(/"/g, '\\"');
+      const safeArtist = metadata.artist.replace(/"/g, '\\"');
 
-      // Inject metadata using ffmpeg
-      const metadataCommand = `${ffmpegPath} -i "${webmOutputPath}" -metadata title="${metadata.title}" -metadata artist="${metadata.artist}" -metadata genre="${genre}" -c:v libvpx -c:a libvorbis -y "${webmWithMetadataPath}"`;
+      const metadataCommand = `${ffmpegPath} -i "${webmOutputPath}" -metadata title="${safeTitle}" -metadata artist="${safeArtist}" -metadata genre="${genre}" -c:v libvpx -c:a libvorbis -y "${webmWithMetadataPath}"`;
 
       exec(metadataCommand, (metadataError, metaStdout, metaStderr) => {
         if (metadataError) {
@@ -90,17 +92,20 @@ const downloadAndInjectMetadata = async (url, index, fileName, metadata) => {
   }
 };
 // Download each link
-links.forEach((trackItem, index) => {
-  if (trackItem.ytUrl) {
-    const artist = trackItem.artists.map(artist => artist.name).join(';')
-    const metaData = {
-      artist,
-      title: trackItem.name
-    };
-    const fileName = `${trackItem.artists[0].name} - ${trackItem.name}`;
-    downloadAndInjectMetadata(trackItem.ytUrl, index, fileName, metaData);
-  }
-});
+const limit = pLimit(3); // Only 3 downloads at once
+
+await Promise.all(
+  links.map((trackItem, index) =>
+    limit(() => {
+      if (trackItem.ytUrl) {
+        const artist = trackItem.artists.map(a => a.name).join(';');
+        const metaData = { artist, title: trackItem.name };
+        const fileName = `${trackItem.artists[0].name} - ${trackItem.name}`;
+        return downloadAndInjectMetadata(trackItem.ytUrl, index, fileName, metaData);
+      }
+    })
+  )
+);
 
 /* const trackItem = links[0]
 if (trackItem.ytUrl) {

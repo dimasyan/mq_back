@@ -2,28 +2,40 @@ import fs from 'fs';
 import path from 'path';
 import { exec } from 'child_process';
 import ffmpeg from 'ffmpeg-static';
+import { spawn } from 'child_process'
+import pLimit from 'p-limit'
 
 // Path to your song directory
-const songsDir = path.resolve('./downloads');
+const songsDir = path.resolve('./songs');
 
 // Function to convert .webm to .mp3 using ffmpeg-static
 const convertWebmToMp3 = (webmFilePath, mp3FilePath) => {
   return new Promise((resolve, reject) => {
-    const command = `"${ffmpeg}" -i "${webmFilePath}" -c:a libmp3lame -b:a 128k -ar 44100 -map a "${mp3FilePath}"`;
+    const ffmpegProcess = spawn(ffmpeg, [
+      '-i', webmFilePath,
+      '-c:a', 'libmp3lame',
+      '-b:a', '128k',
+      '-ar', '44100',
+      '-map', 'a',
+      mp3FilePath,
+    ]);
 
-    exec(command, (error, stdout, stderr) => {
-      if (error) {
-        reject(`Error converting file (${webmFilePath}): ${error.message}`);
-        return;
+    let stderr = '';
+    ffmpegProcess.stderr.on('data', (data) => {
+      stderr += data.toString();
+    });
+
+    ffmpegProcess.on('close', (code) => {
+      if (code !== 0) {
+        reject(`ffmpeg exited with code ${code}: ${stderr}`);
+      } else {
+        resolve(`Successfully converted ${webmFilePath} to ${mp3FilePath}`);
       }
-      if (stderr) {
-        console.warn(`ffmpeg output for ${webmFilePath}: ${stderr}`);
-      }
-      resolve(`Successfully converted ${webmFilePath} to ${mp3FilePath}`);
     });
   });
 };
 
+const limit = pLimit(4)
 // Function to process all .webm files in the songs directory
 const convertAllSongs = async () => {
   try {
@@ -37,28 +49,30 @@ const convertAllSongs = async () => {
       return;
     }
 
-    for (const webmFile of webmFiles) {
-      const webmFilePath = path.join(songsDir, webmFile);
-      const mp3FilePath = path.join(songsDir, webmFile.replace('.webm', '.mp3'));
+    const tasks = webmFiles.map(webmFile => {
+      return limit(async () => {
+        const webmFilePath = path.join(songsDir, webmFile);
+        const mp3FilePath = path.join(songsDir, webmFile.replace('.webm', '.mp3'));
 
-      // Skip if the target .mp3 file already exists
-      if (fs.existsSync(mp3FilePath)) {
-        console.log(`Skipping ${webmFile} as the .mp3 version already exists.`);
-        continue;
-      }
+        if (fs.existsSync(mp3FilePath)) {
+          console.log(`Skipping ${webmFile} as the .mp3 version already exists.`);
+          return;
+        }
 
-      try {
-        console.log(`Converting ${webmFile}...`);
-        await convertWebmToMp3(webmFilePath, mp3FilePath);
-        console.log(`Successfully converted and saved: ${mp3FilePath}`);
+        try {
+          console.log(`Converting ${webmFile}...`);
+          await convertWebmToMp3(webmFilePath, mp3FilePath);
+          console.log(`Successfully converted and saved: ${mp3FilePath}`);
 
-        // Delete the original .webm file after successful conversion
-        fs.unlinkSync(webmFilePath);
-        console.log(`Deleted original .webm file: ${webmFile}`);
-      } catch (error) {
-        console.error(`Error converting ${webmFile}:`, error);
-      }
-    }
+          fs.unlinkSync(webmFilePath);
+          console.log(`Deleted original .webm file: ${webmFile}`);
+        } catch (error) {
+          console.error(`Error converting ${webmFile}:`, error);
+        }
+      });
+    });
+
+    await Promise.all(tasks);
 
     console.log('All conversions and deletions are complete!');
   } catch (error) {

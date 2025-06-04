@@ -1,8 +1,9 @@
 // routes/game.js
 import express from 'express';
 import {Game, GameQuestion, Question, User, Movie, GameRegistration} from '../models/index.js';
-import Sequelize from 'sequelize';
+import Sequelize, { Op } from 'sequelize';
 import axios from "axios";
+import TelegramBot from "node-telegram-bot-api";
 
 const router = express.Router();
 
@@ -314,6 +315,32 @@ router.post('/registerteam', async (req, res) => {
     console.error('Error registering team:', error);
     res.status(500).json({ message: 'Error registering team', error });
   }
+});
+
+const MUSIC_BOT_TOKEN = '7732380183:AAGN7h09w10zFPZHHIsUQarI_nVhfkUKV-I'
+const bot = new TelegramBot(MUSIC_BOT_TOKEN, { polling: false });
+
+const checkUserInChannel = async (telegramUserId) => {
+  const channelUsername = '@dimash_bratan_channel';
+
+  try {
+    const res = await bot.getChatMember(channelUsername, telegramUserId);
+    return ['member', 'administrator', 'creator'].includes(res.status);
+  } catch (err) {
+    console.error('Error checking membership:', err.message);
+    return false;
+  }
+}
+router.post('/auth', async (req, res) => {
+  const userId = req.body.telegramUser?.id;
+
+  const isSubscribed = await checkUserInChannel(userId);
+  if (!isSubscribed) {
+    return res.status(403).json({ message: 'Subscribe to the channel to use the app' });
+  }
+
+  // Continue to game logic...
+  res.json({ success: true });
 });
 
 export default router;

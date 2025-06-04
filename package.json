@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@distube/ytdl-core": "^4.16.10",
+    "@nuclearplayer/ytdl-core": "^4.16.11",
     "axios": "^1.7.7",
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",
@@ -24,6 +25,8 @@
     "music-metadata": "^10.5.1",
     "musicbrainz-api": "^0.19.1",
     "node-cron": "^4.0.5",
+    "node-telegram-bot-api": "^0.66.0",
+    "p-limit": "^6.2.0",
     "pg": "^8.13.0",
     "pg-hstore": "^2.3.4",
     "puppeteer": "^23.8.0",

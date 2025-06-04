@@ -1,5 +1,7 @@
 import cron from 'node-cron';
-import { sequelize } from '../models/index.js'; // adjust the import path if needed
+import models from '../models/index.js'; // adjust the import path if needed
+
+const { sequelize } = models;
 
 const updateRandomKeys = async () => {
   try {
