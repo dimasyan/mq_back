@@ -179,12 +179,26 @@ const movieQuestionTypes = [
   'Назовите фильм по описанию',
 ];
 
-router.get('/newmoviegame', async (req, res) => {
+router.post('/newmoviegame', async (req, res) => {
   try {
+    // Create a new game for the user
+    const { tg_id, tg_username } = req.body;
+
+    if (!tg_id) {
+      return res.status(400).json({ message: 'tg_id is required' });
+    }
+
+    // Find or create the user
+    let user = await User.findOne({ where: { tg_id: tg_id.toString() } });
+    if (!user) {
+      user = await User.create({ tg_id, tg_username });
+    }
+
     // Create a new game for the user
     const game = await Game.create({
       status: 'pending',
       score: 0,
+      tg_id: user.tg_id
     });
 
     // Fetch random 10 movies
@@ -318,13 +332,13 @@ router.post('/registerteam', async (req, res) => {
 });
 
 const MUSIC_BOT_TOKEN = '7732380183:AAGN7h09w10zFPZHHIsUQarI_nVhfkUKV-I'
-const bot = new TelegramBot(MUSIC_BOT_TOKEN, { polling: false });
+const musicBot = new TelegramBot(MUSIC_BOT_TOKEN, { polling: false });
 
 const checkUserInChannel = async (telegramUserId) => {
   const channelUsername = '@dimash_bratan_channel';
 
   try {
-    const res = await bot.getChatMember(channelUsername, telegramUserId);
+    const res = await musicBot.getChatMember(channelUsername, telegramUserId);
     return ['member', 'administrator', 'creator'].includes(res.status);
   } catch (err) {
     console.error('Error checking membership:', err.message);
@@ -335,6 +349,32 @@ router.post('/auth', async (req, res) => {
   const userId = req.body.telegramUser?.id;
 
   const isSubscribed = await checkUserInChannel(userId);
+  if (!isSubscribed) {
+    return res.status(403).json({ message: 'Subscribe to the channel to use the app' });
+  }
+
+  // Continue to game logic...
+  res.json({ success: true });
+});
+
+const MOVIE_BOT_TOKEN = '7883698474:AAE29zfRqK01I4UvR-_iDCRf6xqVTvnxrsc'
+const movieBot = new TelegramBot(MOVIE_BOT_TOKEN, { polling: false });
+
+const checkUserInChannelMovie = async (telegramUserId) => {
+  const channelUsername = '@dimash_bratan_channel';
+
+  try {
+    const res = await movieBot.getChatMember(channelUsername, telegramUserId);
+    return ['member', 'administrator', 'creator'].includes(res.status);
+  } catch (err) {
+    console.error('Error checking membership:', err.message);
+    return false;
+  }
+}
+router.post('/auth/movie', async (req, res) => {
+  const userId = req.body.telegramUser?.id;
+
+  const isSubscribed = await checkUserInChannelMovie(userId);
   if (!isSubscribed) {
     return res.status(403).json({ message: 'Subscribe to the channel to use the app' });
   }
