@@ -293,8 +293,6 @@ router.post('/newmoviegame', async (req, res) => {
   }
 });
 
-const BOT_TOKEN = process.env.BOT_TOKEN
-const CHAT_ID = process.env.ADMIN_CHAT_ID
 router.post('/registerteam', async (req, res) => {
   try {
     const { captainName, teamName, phoneNumber } = req.body;
@@ -316,7 +314,8 @@ router.post('/registerteam', async (req, res) => {
       *Капитан*: ${captainName}
       *Телефон*: ${phoneNumber}
     `;
-
+    const BOT_TOKEN = process.env.BOT_TOKEN
+    const CHAT_ID = process.env.ADMIN_CHAT_ID
     // Send Telegram Notification
     await axios.post(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       chat_id: CHAT_ID,
