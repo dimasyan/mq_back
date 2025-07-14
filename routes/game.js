@@ -330,13 +330,13 @@ router.post('/registerteam', async (req, res) => {
   }
 });
 
-const MUSIC_BOT_TOKEN = process.env.MUSIC_BOT_TOKEN
-const musicBot = new TelegramBot(MUSIC_BOT_TOKEN, { polling: false });
 
 const checkUserInChannel = async (telegramUserId) => {
   const channelUsername = '@dimash_bratan_channel';
 
   try {
+    const MUSIC_BOT_TOKEN = process.env.MUSIC_BOT_TOKEN
+    const musicBot = new TelegramBot(MUSIC_BOT_TOKEN, { polling: false });
     const res = await musicBot.getChatMember(channelUsername, telegramUserId);
     return ['member', 'administrator', 'creator'].includes(res.status);
   } catch (err) {
@@ -356,13 +356,12 @@ router.post('/auth', async (req, res) => {
   res.json({ success: true });
 });
 
-const MOVIE_BOT_TOKEN = process.env.MOVIE_BOT_TOKEN
-const movieBot = new TelegramBot(MOVIE_BOT_TOKEN, { polling: false });
-
 const checkUserInChannelMovie = async (telegramUserId) => {
   const channelUsername = '@dimash_bratan_channel';
 
   try {
+    const MOVIE_BOT_TOKEN = process.env.MOVIE_BOT_TOKEN
+    const movieBot = new TelegramBot(MOVIE_BOT_TOKEN, { polling: false });
     const res = await movieBot.getChatMember(channelUsername, telegramUserId);
     return ['member', 'administrator', 'creator'].includes(res.status);
   } catch (err) {
