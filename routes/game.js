@@ -293,8 +293,8 @@ router.post('/newmoviegame', async (req, res) => {
   }
 });
 
-const BOT_TOKEN = '8034798264:AAFuNZfIgtLI5hkyIAyRGzpx_fdEZyyXdso'
-const CHAT_ID = '-4793289121'
+const BOT_TOKEN = process.env.BOT_TOKEN
+const CHAT_ID = process.env.ADMIN_CHAT_ID
 router.post('/registerteam', async (req, res) => {
   try {
     const { captainName, teamName, phoneNumber } = req.body;
@@ -331,7 +331,7 @@ router.post('/registerteam', async (req, res) => {
   }
 });
 
-const MUSIC_BOT_TOKEN = '7732380183:AAGN7h09w10zFPZHHIsUQarI_nVhfkUKV-I'
+const MUSIC_BOT_TOKEN = process.env.MUSIC_BOT_TOKEN
 const musicBot = new TelegramBot(MUSIC_BOT_TOKEN, { polling: false });
 
 const checkUserInChannel = async (telegramUserId) => {
@@ -357,7 +357,7 @@ router.post('/auth', async (req, res) => {
   res.json({ success: true });
 });
 
-const MOVIE_BOT_TOKEN = '7883698474:AAE29zfRqK01I4UvR-_iDCRf6xqVTvnxrsc'
+const MOVIE_BOT_TOKEN = process.env.MOVIE_BOT_TOKEN
 const movieBot = new TelegramBot(MOVIE_BOT_TOKEN, { polling: false });
 
 const checkUserInChannelMovie = async (telegramUserId) => {
