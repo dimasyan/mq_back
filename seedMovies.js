@@ -15,7 +15,7 @@ function cleanFact(fact) {
 }
 async function seedMovies() {
   try {
-    const dataFilePath = path.join(__dirname, 'topcartoon.json'); // Path to your JSON file
+    const dataFilePath = path.join(__dirname, 'movies_pop-1.json'); // Path to your JSON file
     const jsonData = JSON.parse(fs.readFileSync(dataFilePath, 'utf-8'));
 
     const movies = jsonData.docs.map((movie) => {
@@ -57,7 +57,9 @@ async function seedMovies() {
     console.log(movies)
 
     // Bulk insert movies into the database
-    await Movie.bulkCreate(movies);
+    await Movie.bulkCreate(movies, {
+      ignoreDuplicates: true
+    });
 
     console.log(`${movies.length} movies have been successfully seeded!`);
   } catch (error) {

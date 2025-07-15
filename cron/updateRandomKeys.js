@@ -9,6 +9,11 @@ const updateRandomKeys = async () => {
       UPDATE questions
       SET random_key = RANDOM();
     `);
+
+    await sequelize.query(`
+      UPDATE movies
+      SET random_key = RANDOM();
+    `);
     console.log(`[${new Date().toISOString()}] random_key updated for all questions`);
   } catch (error) {
     console.error('Error in random_key update:', error);

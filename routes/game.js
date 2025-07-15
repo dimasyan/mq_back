@@ -201,11 +201,32 @@ router.post('/newmoviegame', async (req, res) => {
       tg_id: user.tg_id
     });
 
+    const randomCutoff = Math.random();
+
+    const whereClause = {
+      random_key: { [Op.gte]: randomCutoff }
+    };
+
     // Fetch random 10 movies
-    const movies = await Movie.findAll({
+    let movies = await Movie.findAll({
+      where: whereClause,
       limit: 10,
       order: Sequelize.literal('RANDOM()'),
     });
+
+    if (movies.length < 10) {
+      const fallbackWhere = {
+        random_key: { [Op.lt]: randomCutoff }
+      };
+
+      const moreQuestions = await Movie.findAll({
+        where: fallbackWhere,
+        limit: 10 - movies.length,
+        order: [['random_key', 'ASC']]
+      });
+
+      movies = [...movies, ...moreQuestions];
+    }
 
     if (!movies || movies.length < 10) {
       return res.status(400).json({ message: 'Not enough movies available to create a game' });
@@ -329,7 +350,6 @@ router.post('/registerteam', async (req, res) => {
     res.status(500).json({ message: 'Error registering team', error });
   }
 });
-
 
 const checkUserInChannel = async (telegramUserId) => {
   const channelUsername = '@dimash_bratan_channel';
